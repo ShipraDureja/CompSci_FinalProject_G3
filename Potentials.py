@@ -17,8 +17,8 @@ class Potentials():
         particles = self.distance.shape[0]
         potential = np.zeros_like(self.distance)
         for i in range(particles):
-            for j in range(particles): 
-                #Calculated distances from both i to j and vice-versa. Otherwise, for j in range(i+1, particles): 
+            for j in range(i+1, particles): 
+                #Calculated distances from only i to j. Otherwise if considering both directions, for j in range(particles): 
                 if (self.distance[i][j] <= 0 or self.distance[i][j] > cutoff):
                     potential[i][j] = 0.
                 else:
