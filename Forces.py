@@ -31,7 +31,25 @@ class Forces():
                     force[i][j] = 0.
                 else:
                     force[i][j] = 4. * epsilon * (12 * sigma ** 12 / self.distance[i][j] ** 14 - 6 * sigma ** 6 / self.distance[i][j] ** 8)
-                    norm_dist = np.where(self.distance == 0, 1, self.distance)
-                    direction = self.vector / norm_dist[:, :, None]
+        norm_dist = np.where(self.distance == 0, 1, self.distance)
+        direction = self.vector / norm_dist[:, :, None]
         force_lj = force[:, :, None] * direction
         return np.sum(force_lj)
+
+    def coulomb_forces(self):
+        coulomb_force = np.zeros_like(self.distance)
+        coulomb = np.zeros_like(self.distance)
+        for i in range(self.particles):
+            for j in range(i + 1, self.particles):
+                if (self.distance[i][j] <= 0 or self.distance[i][j] > cutoff):
+                    coulomb_force[i][j] = 0.
+                else:
+                    coulomb_force[i][j] = (1 / (4 * np.pi * epsilon)) * (
+                                self.particle_charge[i][j] / self.distance[i][j] ** 3)
+        norm_dist = np.where(self.distance == 0, 1, self.distance)
+        direction = self.vector / norm_dist[:, :, None]
+        coulomb = coulomb_force[:, :, None] * direction
+        return np.sum(coulomb)
+
+    def total_force(self):
+        return self.lj_forces() + self.coulomb_forces()
